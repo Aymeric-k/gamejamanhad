@@ -33,21 +33,25 @@
         let randomSide = Math.round(Math.random() * 4);
         let gamepad;
         let vitesse = 10;
+        let currentPhase = 1;
+        let currentBoatIndex = 0;
+        let phaseTimeLeft = 30 * 60;  // 30 seconds for phase 1
+        let boatChangeTimer = 0;
         const boatsData = [
-    { scale: 0.1, speedThreshold: [11, 80], waveScale: 0.4, phase:1, priority: 1 },
-    {scale: 0.2, speedThreshold: [16, 70], waveScale: 0.45, phase:1,  priority: 1},
-    {scale: 0.3, speedThreshold: [31, 86], waveScale: 0.50, phase:1,  priority: 0},
-    {scale: 0.4, speedThreshold: [16, 81], waveScale: 0.55, phase:2,  priority: 0},
-    {scale: 0.5, speedThreshold: [41, 85], waveScale: 0.60, phase:2,  priority: 0},
-    {scale: 0.55, speedThreshold: [11, 60], waveScale: 0.65, phase:2, priority: 1},
-    {scale: 0.60, speedThreshold: [31, 70], waveScale: 0.70,phase:2,  priority: 1},
-    {scale: 0.65, speedThreshold: [46, 80], waveScale: 0.75, phase:2, priority: 0},
-    {scale: 0.70, speedThreshold: [36, 65], waveScale: 0.80, phase:2, priority: 1},
-    {scale: 0.75, speedThreshold: [31, 50], waveScale: 0.85, phase:2, priority: 0},
-    {scale: 0.80, speedThreshold: [41, 60], waveScale: 0.90, phase:2, priority: 0},
-    {scale: 0.85, speedThreshold: [76, 85], waveScale: 0.95, phase:3, priority: 1}
+            { scale: 0.1, speedThreshold: [11, 80], waveScale: 0.4, phase: 1, priority: 1 },
+            { scale: 0.2, speedThreshold: [16, 70], waveScale: 0.45, phase: 1, priority: 1 },
+            { scale: 0.3, speedThreshold: [31, 86], waveScale: 0.50, phase: 1, priority: 0 },
+            { scale: 0.4, speedThreshold: [16, 81], waveScale: 0.55, phase: 2, priority: 0 },
+            { scale: 0.5, speedThreshold: [41, 85], waveScale: 0.60, phase: 2, priority: 0 },
+            { scale: 0.55, speedThreshold: [11, 60], waveScale: 0.65, phase: 2, priority: 1 },
+            { scale: 0.60, speedThreshold: [31, 70], waveScale: 0.70, phase: 2, priority: 1 },
+            { scale: 0.65, speedThreshold: [46, 80], waveScale: 0.75, phase: 2, priority: 0 },
+            { scale: 0.70, speedThreshold: [36, 65], waveScale: 0.80, phase: 2, priority: 1 },
+            { scale: 0.75, speedThreshold: [31, 50], waveScale: 0.85, phase: 2, priority: 0 },
+            { scale: 0.80, speedThreshold: [41, 60], waveScale: 0.90, phase: 2, priority: 0 },
+            { scale: 0.85, speedThreshold: [76, 85], waveScale: 0.95, phase: 3, priority: 1 }
 
-    ]
+        ]
         switch (randomSide) {
             case 1:
                 yy = 0 + 30
@@ -72,7 +76,7 @@
 
         function preload() {
 
-            this.load.image('boat1', '/assets/img/boat1.png');
+            this.load.image('boat1', 'assets/img/boat1.png');
             // this.load.image('boat2', '/assets/img/boat2.png');
             // this.load.image('boat3', '/assets/img/boat3.png');
             // this.load.image('boat4', '/assets/img/boat4.png');
@@ -85,10 +89,10 @@
             // this.load.image('boat11', '/assets/img/boat11.png');
             // this.load.image('boat12', '/assets/img/boat12.png');
             // this.load.image('boat13', '/assets/img/boat13.png');
-            this.load.image('sea', '/assets/img/sea.jpg');
-            this.load.image('wave', '/assets/img/wave.png');
-            this.load.image('port', '/assets/img/port.png');
-            this.load.image('baril', '/assets/img/baril.png');
+            this.load.image('sea', 'assets/img/sea.jpg');
+            this.load.image('wave', 'assets/img/wave.png');
+            this.load.image('port', 'assets/img/port.png');
+            this.load.image('baril', 'assets/img/baril.png');
             // this.load.image('')
 
 
@@ -109,6 +113,7 @@
             wave.onWorldBounds = true;
             wave.body.setSize(80, 80, 10, 10);
             sea.setScale(0.8)
+            timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
 
         }
 
@@ -216,6 +221,7 @@
             score += 10;
             const scoreBox = document.querySelector('.score');
             scoreBox.innerHTML = "Score : " + score;
+            changeBoat();
             while (randomSide === currentSide) {
                 randomSide = Math.floor(Math.random() * 4) + 1;  // Génère un nouveau côté aléatoire
             }
@@ -254,7 +260,7 @@
             differenceYBoatPort = port.y - boat.y;
         }
         const countdownElement = document.getElementById('timer');
-        let time = 3 * 3600;  // 3 minutes
+        let time = 3 * 80;  // 3 minutes
 
         function updateCountdown() {
             const minutes = Math.floor(time / 60);
@@ -274,6 +280,26 @@
                 if (messageElement) {
                     messageElement.innerHTML = 'Temps Écoulé!';
                 }
+            }
+        }
+        function changeBoat() {
+            // Si le bateau actuel est arrivé au port
+            if (currentBoatIndex < boatsData.length && boatsData[currentBoatIndex].phase === currentPhase) {
+                boat.setScale(boatsData[currentBoatIndex].scale);
+                wave.setScale(boatsData[currentBoatIndex].waveScale);
+                currentBoatIndex++;
+            } else {
+                // Si tous les bateaux de la phase actuelle ont été utilisés, passez à la phase suivante
+                if (currentPhase === 1) {
+                    currentPhase++;
+                    phaseTimeLeft = 150 * 60;  // 2 minutes 30 seconds for phase 2
+                } else {
+                    // Gérer la fin de la partie ou passer à la phase suivante si nécessaire
+                }
+            }
+            // Mise à jour du timer pour le changement de bateau
+            if (currentPhase === 2) {
+                boatChangeTimer = phaseTimeLeft / (boatsData.filter(b => b.phase === 2).length);
             }
         }
     </script>
