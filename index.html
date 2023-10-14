@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
 </head>
 
@@ -30,7 +30,7 @@
         let follow = false;
         let xAxis;
         let yAxis;
-        let randomSide = Math.round(Math.random() * 4);
+        let randomSide = Math.floor(Math.random() * 4)+1;
         let gamepad;
         let vitesse = 10;
         let currentPhase = 1;
@@ -62,24 +62,24 @@
         ]
         switch (randomSide) {
             case 1:
-                yy = 0 + 30
+                yy = 0 + 80
                 xx = Math.random() * 1800 + 30
             case 2:
-                yy = 920
+                yy = 990
                 xx = Math.random() * 1800 + 30
                 break;
             case 3:
-                xx = 0 + 50
+                xx = 0 + 60
                 yy = Math.random() * 920 + 30
                 break;
             case 4:
-                xx = 1800
+                xx = 1870
                 yy = Math.random() * 920 + 30
                 break;
             default:
                 break;
         }
-
+        
         let currentSide = randomSide;
 
         function preload() {
@@ -91,7 +91,8 @@
             }
             this.load.image('sea', './assets/img/sea.jpg');
             this.load.image('wave', './assets/img/wave.png');
-            this.load.image('port', './assets/img/port.png');
+            this.load.image('portV', './assets/img/ponton_vertic.png');
+            this.load.image('portH', './assets/img/ponton_horizont.png');
             this.load.image('baril', './assets/img/baril.png');
             // this.load.image('')
 
@@ -110,7 +111,12 @@
             wave.setScale(boatsData[0].waveScale);
             boat.setScale(boatsData[0].scale);
 
-            port = this.physics.add.image(xx, yy, 'port');
+            if (randomSide === 1 || randomSide === 2) {
+                port = this.physics.add.image(xx, yy, 'portV');  // Utilisez le ponton vertical
+            } else {
+                port = this.physics.add.image(xx, yy, 'portH');  // Utilisez le ponton horizontal
+            }
+            port.setScale(0.5)
             wave.setCollideWorldBounds(true);
             wave.onWorldBounds = true;
             wave.body.setSize(80, 80, 10, 10);
@@ -150,6 +156,7 @@
 
 
         function update(delta) {
+            console.log(randomSide)
             if (gamepad) {
                 if (gamepad.axes.length >= 2) {
                     xAxis = gamepad.axes[0].getValue();
@@ -157,7 +164,7 @@
 
                     wave.x += xAxis * vitesse;
                     wave.y += yAxis * vitesse;
-                  
+
                     if (xAxis < 0) {
                         // Si vous allez vers la gauche
                         // retourner le bateau
@@ -172,7 +179,7 @@
             }
             gamepads = navigator.getGamepads();
             gamepadButton = gamepads[0];
-          
+
             if (follow) { // Seulement mettre à jour la jauge si follow est vrai
                 gaugeValue -= GAUGE_DECREASE * (delta / 100000);
 
@@ -260,7 +267,7 @@
 
 
         }
-     
+
         function arrived() {
             score += 10;
             const scoreBox = document.querySelector('.score');
@@ -274,20 +281,24 @@
             vitesse = 10;
             switch (randomSide) {
                 case 1:
-                    yy = 0 + port.height
+                    yy = 0 + 50
                     xx = (Math.random() * 1800) + port.width
+                    port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 2:
                     yy = game.config.height - 50
                     xx = (Math.random() * 1800) + port.width
+                    port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 3:
-                    xx = 0 + port.width
+                    xx = 0 + 50
                     yy = Math.random() * 920 + port.height
+                    port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 case 4:
                     xx = game.config.width - 50
                     yy = Math.random() * 920 + port.height
+                    port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 default:
                     break;
@@ -325,14 +336,14 @@
             }
         }
         function changeBoat(scene) {
-            
+
             // Si le bateau actuel est arrivé au port
             if (currentBoatIndex < boatsData.length && boatsData[currentBoatIndex].phase === currentPhase) {
-            
-                boat.setTexture('boat'+(currentBoatIndex+1))
+
+                boat.setTexture('boat' + (currentBoatIndex + 1))
                 boat.setScale(boatsData[currentBoatIndex].scale);
-                console.log(boatsData[currentBoatIndex+1].scale)
-                wave.setScale((boatsData[currentBoatIndex+1]).waveScale);
+                console.log(boatsData[currentBoatIndex + 1].scale)
+                wave.setScale((boatsData[currentBoatIndex + 1]).waveScale);
                 selectedBoatIndex++;
                 currentBoatIndex++;
             } else {
