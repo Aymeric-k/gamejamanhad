@@ -47,34 +47,37 @@
         const SPEED_REDUCTION = 3;
         const boatsData = [
             { scale: 0.3, speedThreshold: [11, 80], waveScale: 0.2, phase: 1, priority: 1 },
-            { scale: 0.5, speedThreshold: [16, 70], waveScale: 0.25, phase: 1, priority: 1 },
-            { scale: 0.5, speedThreshold: [31, 86], waveScale: 0.30, phase: 1, priority: 0 },
-            { scale: 0.5, speedThreshold: [16, 81], waveScale: 0.35, phase: 2, priority: 0 },
-            { scale: 0.5, speedThreshold: [41, 85], waveScale: 0.40, phase: 2, priority: 0 },
-            // { scale: 0.55, speedThreshold: [11, 60], waveScale: 0.65, phase: 2, priority: 1 },
-            // { scale: 0.60, speedThreshold: [31, 70], waveScale: 0.70, phase: 2, priority: 1 },
-            // { scale: 0.65, speedThreshold: [46, 80], waveScale: 0.75, phase: 2, priority: 0 },
-            // { scale: 0.70, speedThreshold: [36, 65], waveScale: 0.80, phase: 2, priority: 1 },
-            // { scale: 0.75, speedThreshold: [31, 50], waveScale: 0.85, phase: 2, priority: 0 },
-            // { scale: 0.80, speedThreshold: [41, 60], waveScale: 0.90, phase: 2, priority: 0 },
-            // { scale: 0.85, speedThreshold: [76, 85], waveScale: 0.95, phase: 3, priority: 1 }
+            { scale: 0.55, speedThreshold: [16, 70], waveScale: 0.25, phase: 1, priority: 1 },
+            { scale: 0.55, speedThreshold: [31, 86], waveScale: 0.30, phase: 1, priority: 0 },
+            { scale: 0.55, speedThreshold: [16, 81], waveScale: 0.35, phase: 2, priority: 0 },
+            { scale: 0.55, speedThreshold: [41, 85], waveScale: 0.40, phase: 2, priority: 0 },
+            { scale: 0.65, speedThreshold: [11, 60], waveScale: 0.50, phase: 2, priority: 1 },
+            { scale: 0.65, speedThreshold: [31, 70], waveScale: 0.50, phase: 2, priority: 1 },
+            { scale: 0.75, speedThreshold: [46, 80], waveScale: 0.60, phase: 2, priority: 0 },
+            { scale: 0.75, speedThreshold: [36, 65], waveScale: 0.60, phase: 2, priority: 1 },
+            { scale: 0.85, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
+            { scale: 0.95, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 }
+            
 
         ]
         switch (randomSide) {
             case 1:
-                yy = 0 + 80
-                xx = Math.random() * 1800 + 30
+                yy = 0 + 60
+                xx = Math.random() * window.innerWidth + 30
+               
+                break;
             case 2:
                 yy = 990
-                xx = Math.random() * 1800 + 30
+                xx = Math.random() * window.innerWidth + 30
+                
                 break;
             case 3:
                 xx = 0 + 60
-                yy = Math.random() * 920 + 30
+                yy = Math.random() * window.innerHeight + 30
                 break;
             case 4:
                 xx = 1870
-                yy = Math.random() * 920 + 30
+                yy = Math.random() * window.innerHeight + 30
                 break;
             default:
                 break;
@@ -85,7 +88,7 @@
         function preload() {
 
 
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 10; i++) {
                 this.load.image(`boat${i}`, `./assets/img/boat${i}.png`);
                 boats.push(`boat${i}`);
             }
@@ -107,16 +110,16 @@
             sea = this.add.image(-5, -5, 'sea')
             wave = this.physics.add.image(centerX, centerY, 'wave')
             wave.setScale(0.4)
-            boat = this.physics.add.image(x, y, 'boat1');
-            wave.setScale(boatsData[0].waveScale);
-            boat.setScale(boatsData[0].scale);
-
             if (randomSide === 1 || randomSide === 2) {
                 port = this.physics.add.image(xx, yy, 'portV');  // Utilisez le ponton vertical
             } else {
                 port = this.physics.add.image(xx, yy, 'portH');  // Utilisez le ponton horizontal
             }
             port.setScale(0.5)
+            boat = this.physics.add.image(x, y, 'boat1');
+            wave.setScale(boatsData[0].waveScale);
+            boat.setScale(boatsData[0].scale);
+
             wave.setCollideWorldBounds(true);
             wave.onWorldBounds = true;
             wave.body.setSize(80, 80, 10, 10);
@@ -282,22 +285,22 @@
             switch (randomSide) {
                 case 1:
                     yy = 0 + 50
-                    xx = (Math.random() * 1800) + port.width
+                    xx = (Math.random() * window.innerWidth) 
                     port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 2:
-                    yy = game.config.height - 50
-                    xx = (Math.random() * 1800) + port.width
+                    yy = game.config.height - 60
+                    xx = (Math.random() * window.innerWidth) 
                     port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 3:
                     xx = 0 + 50
-                    yy = Math.random() * 920 + port.height
+                    yy = Math.random() * window.innerHeight
                     port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 case 4:
                     xx = game.config.width - 50
-                    yy = Math.random() * 920 + port.height
+                    yy = Math.random() * window.innerHeight
                     port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 default:
