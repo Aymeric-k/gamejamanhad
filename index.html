@@ -34,22 +34,30 @@
         let gamepad;
         let vitesse = 10;
         let currentPhase = 1;
-        let currentBoatIndex = 0;
+        let currentBoatIndex = 1;
         let phaseTimeLeft = 30 * 60;  // 30 seconds for phase 1
         let boatChangeTimer = 0;
+        let selectedBoatIndex = 1
+        let time = 180;
+        let gaugeValue = 0;
+        let boats = [];
+        let gamepads = navigator.getGamepads();
+        const GAUGE_DECREASE = 4;
+        const GAUGE_INCREASE = 3;
+        const SPEED_REDUCTION = 3;
         const boatsData = [
-            { scale: 0.1, speedThreshold: [11, 80], waveScale: 0.4, phase: 1, priority: 1 },
-            { scale: 0.2, speedThreshold: [16, 70], waveScale: 0.45, phase: 1, priority: 1 },
-            { scale: 0.3, speedThreshold: [31, 86], waveScale: 0.50, phase: 1, priority: 0 },
-            { scale: 0.4, speedThreshold: [16, 81], waveScale: 0.55, phase: 2, priority: 0 },
-            { scale: 0.5, speedThreshold: [41, 85], waveScale: 0.60, phase: 2, priority: 0 },
-            { scale: 0.55, speedThreshold: [11, 60], waveScale: 0.65, phase: 2, priority: 1 },
-            { scale: 0.60, speedThreshold: [31, 70], waveScale: 0.70, phase: 2, priority: 1 },
-            { scale: 0.65, speedThreshold: [46, 80], waveScale: 0.75, phase: 2, priority: 0 },
-            { scale: 0.70, speedThreshold: [36, 65], waveScale: 0.80, phase: 2, priority: 1 },
-            { scale: 0.75, speedThreshold: [31, 50], waveScale: 0.85, phase: 2, priority: 0 },
-            { scale: 0.80, speedThreshold: [41, 60], waveScale: 0.90, phase: 2, priority: 0 },
-            { scale: 0.85, speedThreshold: [76, 85], waveScale: 0.95, phase: 3, priority: 1 }
+            { scale: 0.3, speedThreshold: [11, 80], waveScale: 0.2, phase: 1, priority: 1 },
+            { scale: 0.5, speedThreshold: [16, 70], waveScale: 0.25, phase: 1, priority: 1 },
+            { scale: 0.5, speedThreshold: [31, 86], waveScale: 0.30, phase: 1, priority: 0 },
+            { scale: 0.5, speedThreshold: [16, 81], waveScale: 0.35, phase: 2, priority: 0 },
+            { scale: 0.5, speedThreshold: [41, 85], waveScale: 0.40, phase: 2, priority: 0 },
+            // { scale: 0.55, speedThreshold: [11, 60], waveScale: 0.65, phase: 2, priority: 1 },
+            // { scale: 0.60, speedThreshold: [31, 70], waveScale: 0.70, phase: 2, priority: 1 },
+            // { scale: 0.65, speedThreshold: [46, 80], waveScale: 0.75, phase: 2, priority: 0 },
+            // { scale: 0.70, speedThreshold: [36, 65], waveScale: 0.80, phase: 2, priority: 1 },
+            // { scale: 0.75, speedThreshold: [31, 50], waveScale: 0.85, phase: 2, priority: 0 },
+            // { scale: 0.80, speedThreshold: [41, 60], waveScale: 0.90, phase: 2, priority: 0 },
+            // { scale: 0.85, speedThreshold: [76, 85], waveScale: 0.95, phase: 3, priority: 1 }
 
         ]
         switch (randomSide) {
@@ -76,19 +84,11 @@
 
         function preload() {
 
-            this.load.image('boat1', './assets/img/boat1.png');
-            // this.load.image('boat2', '/assets/img/boat2.png');
-            // this.load.image('boat3', '/assets/img/boat3.png');
-            // this.load.image('boat4', '/assets/img/boat4.png');
-            // this.load.image('boat5', '/assets/img/boat5.png');
-            // this.load.image('boat6', '/assets/img/boat6.png');
-            // this.load.image('boat7', '/assets/img/boat7.png');
-            // this.load.image('boat8', '/assets/img/boat8.png');
-            // this.load.image('boat9', '/assets/img/boat9.png');
-            // this.load.image('boat10', '/assets/img/boat10.png');
-            // this.load.image('boat11', '/assets/img/boat11.png');
-            // this.load.image('boat12', '/assets/img/boat12.png');
-            // this.load.image('boat13', '/assets/img/boat13.png');
+
+            for (let i = 1; i <= 5; i++) {
+                this.load.image(`boat${i}`, `/assets/img/boat${i}.png`);
+                boats.push(`boat${i}`);
+            }
             this.load.image('sea', './assets/img/sea.jpg');
             this.load.image('wave', './assets/img/wave.png');
             this.load.image('port', './assets/img/port.png');
@@ -100,20 +100,28 @@
 
         function create() {
 
-            this.input.gamepad.once('connected', function (pad) {
+            this.input.gamepad.on('connected', function (pad) {
                 gamepad = pad;
             });
             sea = this.add.image(-5, -5, 'sea')
             wave = this.physics.add.image(centerX, centerY, 'wave')
             wave.setScale(0.4)
             boat = this.physics.add.image(x, y, 'boat1');
-            boat.setScale(0.1);
+            wave.setScale(boatsData[0].waveScale);
+            boat.setScale(boatsData[0].scale);
+
             port = this.physics.add.image(xx, yy, 'port');
             wave.setCollideWorldBounds(true);
             wave.onWorldBounds = true;
             wave.body.setSize(80, 80, 10, 10);
             sea.setScale(0.8)
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
+
+            this.createBoat = function (x, y, i) {
+                const boat = this.add.image(x, y, 'boat' + i);
+                // ou 'boat2', 'boat3', etc. en fonction de votre logique
+                return boat;
+            };
 
         }
 
@@ -141,9 +149,7 @@
 
 
 
-        function update() {
-
-            calculBoatWave();
+        function update(delta) {
             if (gamepad) {
                 if (gamepad.axes.length >= 2) {
                     xAxis = gamepad.axes[0].getValue();
@@ -151,6 +157,7 @@
 
                     wave.x += xAxis * vitesse;
                     wave.y += yAxis * vitesse;
+                  
                     if (xAxis < 0) {
                         // Si vous allez vers la gauche
                         // retourner le bateau
@@ -163,6 +170,42 @@
                     }
                 }
             }
+            gamepads = navigator.getGamepads();
+            gamepadButton = gamepads[0];
+          
+            if (follow) { // Seulement mettre à jour la jauge si follow est vrai
+                gaugeValue -= GAUGE_DECREASE * (delta / 100000);
+
+                if (gamepad) {
+                    let buttonXPressed = gamepad.buttons[0].pressed;
+                    let buttonAPressed = gamepad.buttons[1].pressed;
+
+
+                    if (buttonXPressed || buttonAPressed) {
+                        gaugeValue += GAUGE_INCREASE;
+
+                    }
+                }
+            }
+
+            calculBoatWave();
+            boatsData.forEach(boat => {
+                let i = 1;
+                if (gaugeValue < boat.speedThreshold[0] && follow) {
+                    vitesse = 2;
+                } else if (gaugeValue > boat.speedThreshold[1]) {
+                    // Utilisez le sprite du bateau qui coule
+                    if (!sinkingBoatSprite) {
+                        sinkingBoatSprite = this.add.image(x, y, 'boat' + i + 'SinkingSprite');
+                    }
+                    boat.destroy();
+                    createBoat(x, y, i)
+                    gaugeValue = 0;
+                } else {
+                    vitesse = 5;
+                }
+            });
+
             if (Math.abs(differenceXBoatWave) <= 20 && Math.abs(differenceYBoatWave) <= 20) {
                 vitesse = 5;
                 follow = true;
@@ -209,7 +252,7 @@
             } else if (boat.y > game.config.height + boat.height) {
                 boat.y = 0;
             }
-            updateCountdown();
+
         }
         function calculBoatWave() {
             differenceXBoatWave = wave.x - boat.x;
@@ -217,11 +260,12 @@
 
 
         }
+     
         function arrived() {
             score += 10;
             const scoreBox = document.querySelector('.score');
             scoreBox.innerHTML = "Score : " + score;
-            changeBoat();
+            changeBoat(this);
             while (randomSide === currentSide) {
                 randomSide = Math.floor(Math.random() * 4) + 1;  // Génère un nouveau côté aléatoire
             }
@@ -260,12 +304,11 @@
             differenceYBoatPort = port.y - boat.y;
         }
         const countdownElement = document.getElementById('timer');
-        let time = 3 * 80;  // 3 minutes
+
 
         function updateCountdown() {
             const minutes = Math.floor(time / 60);
             const seconds = time % 60;
-
             const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
 
             countdownElement.innerHTML = `TIMER: ${minutes}:${formattedSeconds}`;
@@ -273,20 +316,24 @@
             if (time > 0) {
                 time--;
             } else {
-                clearInterval(interval);
+                this.time.removeEvent(timerEvent); // Arrêtez le timerEvent
                 countdownElement.innerHTML = 'TIMER: 00:00';
-
                 const messageElement = document.getElementById('message');
                 if (messageElement) {
                     messageElement.innerHTML = 'Temps Écoulé!';
                 }
             }
         }
-        function changeBoat() {
+        function changeBoat(scene) {
+            
             // Si le bateau actuel est arrivé au port
             if (currentBoatIndex < boatsData.length && boatsData[currentBoatIndex].phase === currentPhase) {
+            
+                boat.setTexture('boat'+(currentBoatIndex+1))
                 boat.setScale(boatsData[currentBoatIndex].scale);
-                wave.setScale(boatsData[currentBoatIndex].waveScale);
+                console.log(boatsData[currentBoatIndex+1].scale)
+                wave.setScale((boatsData[currentBoatIndex+1]).waveScale);
+                selectedBoatIndex++;
                 currentBoatIndex++;
             } else {
                 // Si tous les bateaux de la phase actuelle ont été utilisés, passez à la phase suivante
@@ -294,7 +341,7 @@
                     currentPhase++;
                     phaseTimeLeft = 150 * 60;  // 2 minutes 30 seconds for phase 2
                 } else {
-                    // Gérer la fin de la partie ou passer à la phase suivante si nécessaire
+
                 }
             }
             // Mise à jour du timer pour le changement de bateau
