@@ -315,12 +315,12 @@
 
                 if (buttonXPressed || buttonAPressed) {
 
-                    gaugeValue += GAUGE_INCREASE * (delta / 18000);
+                    gaugeValue += GAUGE_INCREASE * (delta / 25000);
 
                 }
             }
             if(selectedBoatIndex===13){
-                changeBoat();
+                changeBoat(this);
             }
 
             calculBoatWave();
@@ -562,7 +562,8 @@
             port.destroy();
             boat.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
             boat.setTexture('boat4Sinking');
-            boat.setScale(0.5)
+            boat.setScale(0.5);
+           
         }
 
     </script>
