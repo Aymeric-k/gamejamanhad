@@ -324,7 +324,7 @@
 
                 if (buttonXPressed || buttonAPressed) {
 
-                    gaugeValue += GAUGE_INCREASE * (delta / 25000);
+                    gaugeValue += GAUGE_INCREASE * (delta / 30000);
 
                 }
             }
@@ -566,6 +566,9 @@
                 boatIsSinking = true;
                 boat.setScale(0.5)
                 endGame()
+            }
+            if(currentPhase===3){
+                boat.setTexture('boat4Sinking')
             }
         }
         function endGame() {
