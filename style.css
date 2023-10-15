@@ -46,6 +46,7 @@ h2{
 
 body{
     overflow: hidden;
+    background-color: black;
 }
 #overlay {
     position: absolute;
