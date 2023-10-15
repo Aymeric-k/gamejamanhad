@@ -9,7 +9,7 @@
 <body>
     <div class="hud">
         <div class="score">
-            <h2>SCORE : 0</h2>
+            <h2 class="scorer">SCORE : 0</h2>
         </div>
         <div id="name">
             <h2>unWAVEring</h2>
@@ -71,7 +71,7 @@
             { scale: 0.85, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
             { scale: 0.95, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
             { scale: 0.5, speedThreshold: [0, 0], waveScale: 0.80, phase: 3, priority: 0 },
-            
+
 
 
         ]
@@ -82,7 +82,7 @@
 
                 break;
             case 2:
-                yy = 900
+                yy = 980
                 xx = Math.random() * window.innerWidth + 30
 
                 break;
@@ -198,8 +198,6 @@
                 return boat;
             };
             wave.play('wavy');
-            
-
         
         }
 
@@ -228,7 +226,7 @@
 
 
         function update(delta) {
-        
+
             if (!boatIsSinking) {
                 if (gamepad) {
                     if (gamepad.axes.length >= 2) {
@@ -264,16 +262,16 @@
             if (gamepad) {
                 let buttonXPressed = gamepadButton.buttons[0].pressed;
                 let buttonAPressed = gamepadButton.buttons[1].pressed;
-                console.log(buttonAPressed + " " + buttonXPressed)
+                
 
                 if (buttonXPressed || buttonAPressed) {
 
-                    gaugeValue += GAUGE_INCREASE;
+                    gaugeValue += GAUGE_INCREASE * (delta / 15000);
 
                 }
             }
 
-       
+
             calculBoatWave();
             let boaat = boatsData[selectedBoatIndex];
             if (follow) {
@@ -288,31 +286,23 @@
 
                     boat.setTexture('boat' + selectedBoatIndex + 'Sinking');
                     boat.setScale(0.1)
-                    if (boaat.phase === 1) {
-                        this.detritusInterval = setInterval(() => {
-                            this.spawnDetritus(4, 4);
-                        }, 3000);
-                    } else if (boaat.phase === 2) {
-                        this.detritusInterval = setInterval(() => {
-                            this.spawnDetritus(1,17);
-                        }, 3000);
-                    }
+                 
                     setTimeout(() => {
                         boat.setTexture('boat' + selectedBoatIndex)
-                        boat.setScale(boatsData[selectedBoatIndex].scale);
-
+                        boat.setScale(boatsData[selectedBoatIndex-1].scale);
+                        
 
                         gaugeValue = 0;
                         boatIsSinking = false;
                         boatHasSunk = false
                     }, 2000);
                 } else {
-                    console.log('jepasseparici')
+                   
                     vitesse = 5;
                 }
 
             };
-            
+
             if (Math.abs(differenceXBoatWave) <= 20 && Math.abs(differenceYBoatWave) <= 20) {
 
                 follow = true;
@@ -374,6 +364,10 @@
 
 
         }
+        
+
+        
+
         function handleMouseMove(event) {
             // Calculer la différence entre la position de la souris et la position actuelle de la vague
             const deltaX = event.clientX - wave.x;
@@ -392,7 +386,7 @@
         }
         function arrived() {
             score += 10;
-            const scoreBox = document.querySelector('.score');
+            const scoreBox = document.querySelector('.scorer');
             scoreBox.innerHTML = "Score : " + score;
             changeBoat(this);
             while (randomSide === currentSide) {
@@ -401,6 +395,7 @@
             calculBoatWave();
             follow = false;
             vitesse = 10;
+            gaugeValue=0;
             switch (randomSide) {
                 case 1:
                     yy = 0 + 50
@@ -414,7 +409,7 @@
                     ;  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 2:
-                    yy = game.config.height - 80
+                    yy = game.config.height - 40
                     xx = (Math.random() * window.innerWidth)
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainV');
@@ -464,7 +459,7 @@
             const minutes = Math.floor(time / 60);
             const seconds = time % 60;
             const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-
+            console.log(gaugeValue)
             countdownElement.innerText = `TIMER: ${minutes}:${formattedSeconds}`;
 
             if (time > 0) {
@@ -503,11 +498,11 @@
             // Mise à jour du timer pour le changement de bateau
             if (currentPhase === 2) {
                 boatChangeTimer = phaseTimeLeft / (boatsData.filter(b => b.phase === 2).length);
-            }else if(currentPhase===3){
-                clearInterval(this.detritusInterval);
+            } else if (currentPhase === 3) {
+                
             }
         }
-        
+
     </script>
 
 </body>
