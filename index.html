@@ -160,6 +160,7 @@
             sea = this.add.image(-5, -5, 'sea')
             wave = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'wave').setInteractive();
             wave.setScale(0.4)
+            detritut = this.physics.add(window.innerWidth, window.innerHeight, 'detritut')
             if (randomSide === 1 || randomSide === 2) {
 
                 port = this.physics.add.image(xx, yy, 'mainV');  // Utilisez le ponton vertical
@@ -175,8 +176,6 @@
             }
             port.setScale(0.5)
             boat = this.physics.add.image(x, y, 'boat1');
-            detritut = this.physics.add.image(xxx, yyy, 'detritut4')
-            detritut.setScale(0.1)
             wave.setScale(boatsData[0].waveScale);
             boat.setScale(boatsData[0].scale);
 
@@ -202,12 +201,6 @@
             wave.play('wavy');
             this.detritutGroup = this.physics.add.group();
 
-            // this.tweens.add({
-            //     targets: camera,
-            //     zoom: { from: 1, to: 0.5 }, // Dezoomer de 1x (normal) à 0.5x
-            //     duration: 3000, // Durée de l'animation en millisecondes
-            //     ease: 'Linear', // Type d'interpolation
-            // });
 
         }
 
@@ -276,7 +269,8 @@
         }
 
         function update(delta) {
-            console.log(this.detritutGroup)
+            detritut.x-=1
+            detr
             this.detritutGroup.getChildren().forEach(detritut => {
                 if (detritut.x < 0 || detritut.x > window.innerWidth || detritut.y < 0 || detritut.y > window.innerHeight) {
                     detritut.destroy();
@@ -321,11 +315,13 @@
 
                 if (buttonXPressed || buttonAPressed) {
 
-                    gaugeValue += GAUGE_INCREASE * (delta / 15000);
+                    gaugeValue += GAUGE_INCREASE * (delta / 18000);
 
                 }
             }
-
+            if(selectedBoatIndex===13){
+                changeBoat();
+            }
 
             calculBoatWave();
             let boaat = boatsData[selectedBoatIndex];
@@ -511,6 +507,8 @@
 
 
         function updateCountdown() {
+           
+
             const minutes = Math.floor(time / 60);
             const seconds = time % 60;
             const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
@@ -546,21 +544,23 @@
                 if (currentPhase === 1) {
                     currentPhase++;
                     phaseTimeLeft = 150 * 60;  // 2 minutes 30 seconds for phase 2
-                } else {
-
+                } else if(currentPhase === 2) {
+                    currentPhase++;
                 }
             }
             // Mise à jour du timer pour le changement de bateau
             if (currentPhase === 2) {
                 boatChangeTimer = phaseTimeLeft / (boatsData.filter(b => b.phase === 2).length);
-            } else if (currentPhase === 3) {
-                boat.setTexture('boat11Sinking');
+            } else if (currentPhase === 3 || countdownElement.getValue === '0:00') {
+                boatHasSunk = true;
+                boatIsSinking=true;
                 engGame()
             }
         }
         function endGame(){
             port.destroy();
-            
+            boat.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
+            boat.setTexture('boat11Sinking');
         }
 
     </script>
