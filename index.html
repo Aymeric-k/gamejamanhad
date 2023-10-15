@@ -93,15 +93,15 @@
                 boats.push(`boat${i}`);
             }
             this.load.image('sea', './assets/img/sea.jpg');
-           
+
             this.load.image('portV', './assets/img/ponton_vertic.png');
             this.load.image('portH', './assets/img/ponton_horizont.png');
             this.load.image('mainH', './assets/img/main_horizont.png')
             this.load.image('mainV', './assets/img/main_vertic.png')
             this.load.image('baril', './assets/img/baril.png');
             this.load.spritesheet('wave', './assets/img/sprite_wave.png', {
-                frameWidth:480,
-                frameHeight:195
+                frameWidth: 480,
+                frameHeight: 195
             })
 
 
@@ -113,19 +113,19 @@
                 gamepad = pad;
             });
             sea = this.add.image(-5, -5, 'sea')
-            wave = this.physics.add.sprite(window.innerWidth/2, window.innerHeight/2,'wave').setInteractive();
+            wave = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'wave').setInteractive();
             wave.setScale(0.4)
             if (randomSide === 1 || randomSide === 2) {
 
                 port = this.physics.add.image(xx, yy, 'mainV');  // Utilisez le ponton vertical
                 if (randomSide === 2) {
                     port.flipY = true
-                } 
+                }
             } else {
-                
+
                 port = this.physics.add.image(xx, yy, 'mainH');  // Utilisez le ponton horizontal
-                if(randomSide===3){
-                    port.flipX=true
+                if (randomSide === 3) {
+                    port.flipX = true
                 }
             }
             port.setScale(0.5)
@@ -139,13 +139,13 @@
             sea.setScale(0.8)
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
             this.anims.create({
-                key:'wavy',
-                frames:this.anims.generateFrameNumbers('wave', {
-                    start:0,
-                    end:2
+                key: 'wavy',
+                frames: this.anims.generateFrameNumbers('wave', {
+                    start: 0,
+                    end: 2
                 }),
-                frameRate:4,
-                repeat:-1
+                frameRate: 4,
+                repeat: -1
             })
             this.createBoat = function (x, y, i) {
                 const boat = this.add.image(x, y, 'boat' + i);
@@ -203,7 +203,7 @@
                 gamepads = navigator.getGamepads();
                 gamepadButton = gamepads[0];
             } else {
-
+                document.addEventListener('mousemove', handleMouseMove);
             }
 
             if (follow) { // Seulement mettre à jour la jauge si follow est vrai
@@ -212,7 +212,7 @@
                 if (gamepad) {
                     let buttonXPressed = gamepadButton.buttons[0].pressed;
                     let buttonAPressed = gamepadButton.buttons[1].pressed;
-                    console.log(buttonAPressed +" " +buttonXPressed)
+                    console.log(buttonAPressed + " " + buttonXPressed)
 
                     if (buttonXPressed || buttonAPressed) {
                         console.log('test')
@@ -294,7 +294,22 @@
 
 
         }
+        function handleMouseMove(event) {
+            // Calculer la différence entre la position de la souris et la position actuelle de la vague
+            const deltaX = event.clientX - wave.x;
+            const deltaY = event.clientY - wave.y;
 
+            // Déterminer la direction de la vague
+            if (deltaX < 0) {
+                wave.flipX = true;  // retourner la vague
+            } else if (deltaX > 0) {
+                wave.flipX = false; // ne pas retourner la vague
+            }
+
+            // Déplacez la vague vers la position de la souris avec une certaine vitesse
+            wave.x += Math.sign(deltaX) * vitesse;
+            wave.y += Math.sign(deltaY) * vitesse;
+        }
         function arrived() {
             score += 10;
             const scoreBox = document.querySelector('.score');
