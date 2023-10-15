@@ -9,10 +9,10 @@
 <body>
     <div class="hud">
         <div class="score">
-            <h2 >SCORE : 0</h2>
+            <h2>SCORE : 0</h2>
         </div>
         <div id="name">
-            <h2 >unWAVEring</h2>
+            <h2>unWAVEring</h2>
         </div>
         <div id="timer">
             <h2 id="time">TIMER: 3:00 </h2>
@@ -51,6 +51,8 @@
         let gaugeValue = 0;
         let boats = [];
         let gamepads = navigator.getGamepads();
+        let boatIsSinking = false;
+        let boatHasSunk = false;
         const GAUGE_DECREASE = 4;
         const GAUGE_INCREASE = 3;
         const SPEED_REDUCTION = 3;
@@ -76,7 +78,7 @@
 
                 break;
             case 2:
-                yy = 990
+                yy = 900
                 xx = Math.random() * window.innerWidth + 30
 
                 break;
@@ -100,6 +102,9 @@
             for (let i = 1; i <= 10; i++) {
                 this.load.image(`boat${i}`, `./assets/img/boat${i}.png`);
                 boats.push(`boat${i}`);
+            }
+            for (let i = 1; i <= 10; i++) {
+                this.load.image(`boat${i}Sinking`, `./assets/img/boat${i}Sinking.png`);
             }
             this.load.image('sea', './assets/img/sea.jpg');
 
@@ -189,34 +194,38 @@
 
 
         function update(delta) {
-            console.log(randomSide)
-            if (gamepad) {
-                if (gamepad.axes.length >= 2) {
-                    xAxis = gamepad.axes[0].getValue();
-                    yAxis = gamepad.axes[1].getValue();
+            console.log(gaugeValue+" vitesse :"+ vitesse)
+            if (!boatIsSinking) {
+                if (gamepad) {
+                    if (gamepad.axes.length >= 2) {
+                        xAxis = gamepad.axes[0].getValue();
+                        yAxis = gamepad.axes[1].getValue();
 
-                    wave.x += xAxis * vitesse;
-                    wave.y += yAxis * vitesse;
+                        wave.x += xAxis * vitesse;
+                        wave.y += yAxis * vitesse;
 
-                    if (xAxis < 0) {
-                        // Si vous allez vers la gauche
-                        // retourner le bateau
-                        wave.flipX = true;  // retourner la vague
-                    } else if (xAxis > 0) {
-                        // Si vous allez vers la droite
-                        // ne pas retourner le bateau
-                        boat.flipX = false;
-                        wave.flipX = false; // ne pas retourner la vague
+                        if (xAxis < 0) {
+                            // Si vous allez vers la gauche
+                            // retourner le bateau
+                            wave.flipX = true;  // retourner la vague
+                        } else if (xAxis > 0) {
+                            // Si vous allez vers la droite
+                            // ne pas retourner le bateau
+                            boat.flipX = false;
+                            wave.flipX = false; // ne pas retourner la vague
+                        }
                     }
+                    gamepads = navigator.getGamepads();
+                    gamepadButton = gamepads[0];
+                } else {
+                    document.addEventListener('mousemove', handleMouseMove);
                 }
-                gamepads = navigator.getGamepads();
-                gamepadButton = gamepads[0];
-            } else {
-                document.addEventListener('mousemove', handleMouseMove);
             }
-
             if (follow) { // Seulement mettre à jour la jauge si follow est vrai
-                gaugeValue -= GAUGE_DECREASE * (delta / 100000);
+                if (gaugeValue>0) {
+                    
+                    gaugeValue -= GAUGE_DECREASE * (delta / 100000);
+                }
 
                 if (gamepad) {
                     let buttonXPressed = gamepadButton.buttons[0].pressed;
@@ -224,7 +233,7 @@
                     console.log(buttonAPressed + " " + buttonXPressed)
 
                     if (buttonXPressed || buttonAPressed) {
-                        console.log('test')
+
                         gaugeValue += GAUGE_INCREASE;
 
                     }
@@ -232,21 +241,31 @@
             }
 
             calculBoatWave();
-            boatsData.forEach(boat => {
-                let i = 1;
-                if (gaugeValue < boat.speedThreshold[0] && follow) {
-                    vitesse = 2;
-                } else if (gaugeValue > boat.speedThreshold[1]) {
-                    // Utilisez le sprite du bateau qui coule
-                    if (!sinkingBoatSprite) {
-                        sinkingBoatSprite = this.add.image(x, y, 'boat' + i + 'SinkingSprite');
+            boatsData.forEach((boaat) => {
+                    
+                    if (gaugeValue < boaat.speedThreshold[0] && follow==true) {
+                        vitesse = 2;
+                    } else if (gaugeValue > boaat.speedThreshold[1]) {
+                        // Utilisez le sprite du bateau qui coule
+                        boatIsSinking = true;
+                        boatHasSunk = true
+
+                        boat.setTexture('boat' + selectedBoatIndex + 'Sinking');
+                        boat.setScale(0.1)
+
+                        setTimeout(() => {
+                            boat.setTexture('boat' + selectedBoatIndex)
+                            boat.setScale(boatsData[selectedBoatIndex].scale);
+
+
+                            gaugeValue = 0;
+                            boatIsSinking = false;
+                            boatHasSunk = false
+                        }, 2000);
+                    } else {
+                        vitesse = 5;
                     }
-                    boat.destroy();
-                    createBoat(x, y, i)
-                    gaugeValue = 0;
-                } else {
-                    vitesse = 5;
-                }
+                
             });
 
             if (Math.abs(differenceXBoatWave) <= 20 && Math.abs(differenceYBoatWave) <= 20) {
@@ -333,7 +352,7 @@
             switch (randomSide) {
                 case 1:
                     yy = 0 + 50
-                    xx = (Math.random() * window.innerWidth)
+                    xx = (Math.random() * window.innerWidth-50)
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainV');
 
@@ -343,7 +362,7 @@
                     ;  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 2:
-                    yy = game.config.height - 60
+                    yy = game.config.height - 80
                     xx = (Math.random() * window.innerWidth)
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainV');
@@ -357,7 +376,7 @@
                     yy = Math.random() * window.innerHeight
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainH');
-                        // port.flipX =true
+                        port.flipX =true
 
                     } else {
                         port.setTexture('portH')
@@ -414,7 +433,7 @@
 
                 boat.setTexture('boat' + (currentBoatIndex + 1))
                 boat.setScale(boatsData[currentBoatIndex].scale);
-                console.log(boatsData[currentBoatIndex + 1].scale)
+
                 wave.setScale((boatsData[currentBoatIndex + 1]).waveScale);
                 selectedBoatIndex++;
                 currentBoatIndex++;
