@@ -30,7 +30,7 @@
         let follow = false;
         let xAxis;
         let yAxis;
-        let randomSide = Math.floor(Math.random() * 4)+1;
+        let randomSide = Math.floor(Math.random() * 4) + 1;
         let gamepad;
         let vitesse = 10;
         let currentPhase = 1;
@@ -57,19 +57,19 @@
             { scale: 0.75, speedThreshold: [36, 65], waveScale: 0.60, phase: 2, priority: 1 },
             { scale: 0.85, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
             { scale: 0.95, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 }
-            
+
 
         ]
         switch (randomSide) {
             case 1:
                 yy = 0 + 60
                 xx = Math.random() * window.innerWidth + 30
-               
+
                 break;
             case 2:
                 yy = 990
                 xx = Math.random() * window.innerWidth + 30
-                
+
                 break;
             case 3:
                 xx = 0 + 60
@@ -82,7 +82,7 @@
             default:
                 break;
         }
-        
+
         let currentSide = randomSide;
 
         function preload() {
@@ -93,11 +93,16 @@
                 boats.push(`boat${i}`);
             }
             this.load.image('sea', './assets/img/sea.jpg');
-            this.load.image('wave', './assets/img/wave.png');
+           
             this.load.image('portV', './assets/img/ponton_vertic.png');
             this.load.image('portH', './assets/img/ponton_horizont.png');
+            this.load.image('mainH', './assets/img/main_horizont.png')
+            this.load.image('mainV', './assets/img/main_vertic.png')
             this.load.image('baril', './assets/img/baril.png');
-            // this.load.image('')
+            this.load.spritesheet('wave', './assets/img/sprite_wave.png', {
+                frameWidth:984,
+                frameHeight:250
+            })
 
 
         }
@@ -108,12 +113,20 @@
                 gamepad = pad;
             });
             sea = this.add.image(-5, -5, 'sea')
-            wave = this.physics.add.image(centerX, centerY, 'wave')
+            wave = this.physics.add.sprite(window.innerWidth/2, window.innerHeight/2,'wave').setInteractive();
             wave.setScale(0.4)
             if (randomSide === 1 || randomSide === 2) {
-                port = this.physics.add.image(xx, yy, 'portV');  // Utilisez le ponton vertical
+
+                port = this.physics.add.image(xx, yy, 'mainV');  // Utilisez le ponton vertical
+                if (randomSide === 2) {
+                    port.flipY = true
+                } 
             } else {
-                port = this.physics.add.image(xx, yy, 'portH');  // Utilisez le ponton horizontal
+                
+                port = this.physics.add.image(xx, yy, 'mainH');  // Utilisez le ponton horizontal
+                if(randomSide===3){
+                    port.flipX=true
+                }
             }
             port.setScale(0.5)
             boat = this.physics.add.image(x, y, 'boat1');
@@ -125,13 +138,21 @@
             wave.body.setSize(80, 80, 10, 10);
             sea.setScale(0.8)
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
-
+            this.anims.create({
+                key:'wavy',
+                frames:this.anims.generateFrameNumbers('wave', {
+                    start:0,
+                    end:2
+                }),
+                frameRate:4,
+                repeat:-1
+            })
             this.createBoat = function (x, y, i) {
                 const boat = this.add.image(x, y, 'boat' + i);
                 // ou 'boat2', 'boat3', etc. en fonction de votre logique
                 return boat;
             };
-
+            wave.play('wavy');
         }
 
 
@@ -179,19 +200,22 @@
                         wave.flipX = false; // ne pas retourner la vague
                     }
                 }
+                gamepads = navigator.getGamepads();
+                gamepadButton = gamepads[0];
+            } else {
+
             }
-            gamepads = navigator.getGamepads();
-            gamepadButton = gamepads[0];
 
             if (follow) { // Seulement mettre à jour la jauge si follow est vrai
                 gaugeValue -= GAUGE_DECREASE * (delta / 100000);
 
                 if (gamepad) {
-                    let buttonXPressed = gamepad.buttons[0].pressed;
-                    let buttonAPressed = gamepad.buttons[1].pressed;
-
+                    let buttonXPressed = gamepadButton.buttons[0].pressed;
+                    let buttonAPressed = gamepadButton.buttons[1].pressed;
+                    console.log(buttonAPressed +" " +buttonXPressed)
 
                     if (buttonXPressed || buttonAPressed) {
+                        console.log('test')
                         gaugeValue += GAUGE_INCREASE;
 
                     }
@@ -285,23 +309,44 @@
             switch (randomSide) {
                 case 1:
                     yy = 0 + 50
-                    xx = (Math.random() * window.innerWidth) 
-                    port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
+                    xx = (Math.random() * window.innerWidth)
+                    if (currentBoatIndex < 3) {
+                        port.setTexture('mainV');
+
+                    } else {
+                        port.setTexture('portV')
+                    }
+                    ;  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 2:
                     yy = game.config.height - 60
-                    xx = (Math.random() * window.innerWidth) 
-                    port.setTexture('portV');  // Mettez à jour l'image pour le ponton vertical
+                    xx = (Math.random() * window.innerWidth)
+                    if (currentBoatIndex < 3) {
+                        port.setTexture('mainV');
+                        port.flipY = true
+                    } else {
+                        port.setTexture('portV')
+                    }  // Mettez à jour l'image pour le ponton vertical
                     break;
                 case 3:
                     xx = 0 + 50
                     yy = Math.random() * window.innerHeight
-                    port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
+                    if (currentBoatIndex < 3) {
+                        port.setTexture('mainH');
+                        // port.flipX =true
+
+                    } else {
+                        port.setTexture('portH')
+                    }  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 case 4:
                     xx = game.config.width - 50
                     yy = Math.random() * window.innerHeight
-                    port.setTexture('portH');  // Mettez à jour l'image pour le ponton horizontal
+                    if (currentBoatIndex < 3) {
+                        port.setTexture('mainH');
+                    } else {
+                        port.setTexture('portH')
+                    }  // Mettez à jour l'image pour le ponton horizontal
                     break;
                 default:
                     break;
