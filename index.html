@@ -53,6 +53,8 @@
         let gamepads = navigator.getGamepads();
         let boatIsSinking = false;
         let boatHasSunk = false;
+        let randomDet = Math.floor(Math.random() * 4) + 1;
+        let targetX, targetY;
         const GAUGE_DECREASE = 4;
         const GAUGE_INCREASE = 3;
         const SPEED_REDUCTION = 3;
@@ -67,7 +69,9 @@
             { scale: 0.75, speedThreshold: [46, 80], waveScale: 0.60, phase: 2, priority: 0 },
             { scale: 0.75, speedThreshold: [36, 65], waveScale: 0.60, phase: 2, priority: 1 },
             { scale: 0.85, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
-            { scale: 0.95, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 }
+            { scale: 0.95, speedThreshold: [31, 50], waveScale: 0.70, phase: 2, priority: 0 },
+            { scale: 0.5, speedThreshold: [0, 0], waveScale: 0.80, phase: 3, priority: 0 },
+            
 
 
         ]
@@ -93,6 +97,28 @@
             default:
                 break;
         }
+        switch (randomDet) {
+            case 1:
+                yyy = 0 + 60
+                xxx = Math.random() * window.innerWidth + 30
+
+                break;
+            case 2:
+                yyy = 900
+                xxx = Math.random() * window.innerWidth + 30
+
+                break;
+            case 3:
+                xxx = 0 + 60
+                yyy = Math.random() * window.innerHeight + 30
+                break;
+            case 4:
+                xxx = 1870
+                yyy = Math.random() * window.innerHeight + 30
+                break;
+            default:
+                break;
+        }
 
         let currentSide = randomSide;
 
@@ -105,6 +131,9 @@
             }
             for (let i = 1; i <= 10; i++) {
                 this.load.image(`boat${i}Sinking`, `./assets/img/boat${i}Sinking.png`);
+            }
+            for (let i = 1; i <= 17; i++) {
+                this.load.image(`detritut${i}`, `./assets/img/det${i}.png`);
             }
             this.load.image('sea', './assets/img/sea.jpg');
 
@@ -144,13 +173,15 @@
             }
             port.setScale(0.5)
             boat = this.physics.add.image(x, y, 'boat1');
+            detritut = this.physics.add.image(xxx, yyy, 'detritut4')
+            detritut.setScale(0.3)
             wave.setScale(boatsData[0].waveScale);
             boat.setScale(boatsData[0].scale);
 
             wave.setCollideWorldBounds(true);
             wave.onWorldBounds = true;
             wave.body.setSize(40, 40, 10, 10);
-            sea.setScale(0.8)
+            sea.setScale(1)
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
             this.anims.create({
                 key: 'wavy',
@@ -167,6 +198,9 @@
                 return boat;
             };
             wave.play('wavy');
+            
+
+        
         }
 
 
@@ -194,7 +228,7 @@
 
 
         function update(delta) {
-            console.log(gaugeValue+" vitesse :"+ vitesse)
+        
             if (!boatIsSinking) {
                 if (gamepad) {
                     if (gamepad.axes.length >= 2) {
@@ -222,61 +256,74 @@
                 }
             }
             if (follow) { // Seulement mettre à jour la jauge si follow est vrai
-                if (gaugeValue>0) {
-                    
+                if (gaugeValue > 0) {
+
                     gaugeValue -= GAUGE_DECREASE * (delta / 100000);
                 }
+            }
+            if (gamepad) {
+                let buttonXPressed = gamepadButton.buttons[0].pressed;
+                let buttonAPressed = gamepadButton.buttons[1].pressed;
+                console.log(buttonAPressed + " " + buttonXPressed)
 
-                if (gamepad) {
-                    let buttonXPressed = gamepadButton.buttons[0].pressed;
-                    let buttonAPressed = gamepadButton.buttons[1].pressed;
-                    console.log(buttonAPressed + " " + buttonXPressed)
+                if (buttonXPressed || buttonAPressed) {
 
-                    if (buttonXPressed || buttonAPressed) {
+                    gaugeValue += GAUGE_INCREASE;
 
-                        gaugeValue += GAUGE_INCREASE;
-
-                    }
                 }
             }
 
+       
             calculBoatWave();
-            boatsData.forEach((boaat) => {
-                    
-                    if (gaugeValue < boaat.speedThreshold[0]) {
-                        vitesse = 2;
-                    } else if (gaugeValue > boaat.speedThreshold[1]) {
-                        // Utilisez le sprite du bateau qui coule
-                        boatIsSinking = true;
-                        boatHasSunk = true
+            let boaat = boatsData[selectedBoatIndex];
+            if (follow) {
 
-                        boat.setTexture('boat' + selectedBoatIndex + 'Sinking');
-                        boat.setScale(0.1)
+                if ((gaugeValue < boaat.speedThreshold[0])) {
+                    console.log(boaat.speedThreshold[0])
+                    vitesse = 2;
+                } else if (gaugeValue > boaat.speedThreshold[1]) {
+                    // Utilisez le sprite du bateau qui coule
+                    boatIsSinking = true;
+                    boatHasSunk = true
 
-                        setTimeout(() => {
-                            boat.setTexture('boat' + selectedBoatIndex)
-                            boat.setScale(boatsData[selectedBoatIndex].scale);
-
-
-                            gaugeValue = 0;
-                            boatIsSinking = false;
-                            boatHasSunk = false
-                        }, 2000);
-                    } else {
-                        vitesse = 5;
+                    boat.setTexture('boat' + selectedBoatIndex + 'Sinking');
+                    boat.setScale(0.1)
+                    if (boaat.phase === 1) {
+                        this.detritusInterval = setInterval(() => {
+                            this.spawnDetritus(4, 4);
+                        }, 3000);
+                    } else if (boaat.phase === 2) {
+                        this.detritusInterval = setInterval(() => {
+                            this.spawnDetritus(1,17);
+                        }, 3000);
                     }
-                
-            });
+                    setTimeout(() => {
+                        boat.setTexture('boat' + selectedBoatIndex)
+                        boat.setScale(boatsData[selectedBoatIndex].scale);
 
+
+                        gaugeValue = 0;
+                        boatIsSinking = false;
+                        boatHasSunk = false
+                    }, 2000);
+                } else {
+                    console.log('jepasseparici')
+                    vitesse = 5;
+                }
+
+            };
+            
             if (Math.abs(differenceXBoatWave) <= 20 && Math.abs(differenceYBoatWave) <= 20) {
-                vitesse = 5;
+
                 follow = true;
+
+
 
                 let distance = Math.sqrt(differenceXBoatWave * differenceXBoatWave + differenceYBoatWave * differenceYBoatWave);
 
                 // Si le bateau est très proche de la vague, arrêtez de le déplacer
                 if (distance <= 10) {
-                    follow = true 
+                    follow = true
                     return;
                 }
                 if (xAxis < 0) {
@@ -300,11 +347,13 @@
                 boat.y += moveY;
                 calculBoatPort()
                 if (Math.abs(differenceXBoatPort) <= 20 && Math.abs(differenceYBoatPort) <= 20) {
-                    follow = false
+
                     arrived();
                 }
-            } else {
+            }
+            else {
                 follow = false
+                vitesse = 5
                 boat.x++
                 boat.y++
                 boat.flipX = false;
@@ -355,7 +404,7 @@
             switch (randomSide) {
                 case 1:
                     yy = 0 + 50
-                    xx = (Math.random() * window.innerWidth-50)
+                    xx = (Math.random() * window.innerWidth - 50)
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainV');
 
@@ -379,7 +428,7 @@
                     yy = Math.random() * window.innerHeight
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainH');
-                        port.flipX =true
+                        port.flipX = true
 
                     } else {
                         port.setTexture('portH')
@@ -438,8 +487,10 @@
                 boat.setScale(boatsData[currentBoatIndex].scale);
 
                 wave.setScale((boatsData[currentBoatIndex + 1]).waveScale);
+
                 selectedBoatIndex++;
                 currentBoatIndex++;
+
             } else {
                 // Si tous les bateaux de la phase actuelle ont été utilisés, passez à la phase suivante
                 if (currentPhase === 1) {
@@ -452,8 +503,11 @@
             // Mise à jour du timer pour le changement de bateau
             if (currentPhase === 2) {
                 boatChangeTimer = phaseTimeLeft / (boatsData.filter(b => b.phase === 2).length);
+            }else if(currentPhase===3){
+                clearInterval(this.detritusInterval);
             }
         }
+        
     </script>
 
 </body>
