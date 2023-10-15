@@ -1,12 +1,48 @@
+@font-face {
+    font-family: Scratch;
+    src: url(./assets/img/Scratch.ttf);
+}
 *{
     box-sizing: border-box;
     margin: 0;
     user-select: none;
+    font-family: 'Scratch';
+    font-weight: 400;
+}
+h2{
+  font-size: 45px;
+    color: white;
+}
+.hud{
+    display: flex;
+    background-color: none;
+    /* justify-content: space-around; */
+    position: absolute;
+    width: 100%;
+
+}
+.hud div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .score{
     position: absolute;
-    left: 50%;
+    left: 50px;
+    top: 5px;
 }
+#timer{
+    position: absolute;
+    top: 5px;
+    right: 50px;
+}
+#name{
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    right: 50%;
+}
+
 body{
     overflow: hidden;
 }

@@ -7,9 +7,18 @@
 </head>
 
 <body>
-    <h2 class="score">SCORE : 0</h2>
-    <h2 id="timer">TIMER: 3:00 </h2>
-    <h2 id="message"></h2>
+    <div class="hud">
+        <div class="score">
+            <h2 >SCORE : 0</h2>
+        </div>
+        <div id="name">
+            <h2 >unWAVEring</h2>
+        </div>
+        <div id="timer">
+            <h2 id="time">TIMER: 3:00 </h2>
+        </div>
+    </div>
+
 
     <script>
         let x = (Math.random() * 1800) + 20;
@@ -377,7 +386,7 @@
             differenceXBoatPort = port.x - boat.x;
             differenceYBoatPort = port.y - boat.y;
         }
-        const countdownElement = document.getElementById('timer');
+        const countdownElement = document.getElementById('time');
 
 
         function updateCountdown() {
@@ -385,16 +394,16 @@
             const seconds = time % 60;
             const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
 
-            countdownElement.innerHTML = `TIMER: ${minutes}:${formattedSeconds}`;
+            countdownElement.innerText = `TIMER: ${minutes}:${formattedSeconds}`;
 
             if (time > 0) {
                 time--;
             } else {
                 this.time.removeEvent(timerEvent); // Arrêtez le timerEvent
-                countdownElement.innerHTML = 'TIMER: 00:00';
+                countdownElement.innerText = 'TIMER: 00:00';
                 const messageElement = document.getElementById('message');
                 if (messageElement) {
-                    messageElement.innerHTML = 'Temps Écoulé!';
+                    messageElement.innerText = 'Temps Écoulé!';
                 }
             }
         }
