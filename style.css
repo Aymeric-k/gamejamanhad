@@ -61,7 +61,17 @@ body{
 }
 #gameplay{
     position: absolute;
-    left: 100%;
-    top: 0%;
-    transform: translate(-50%, -50%);
+    left: 15%;
+    top: 25%;
+    transform: translate(-15%, -25%);
+    opacity: 1; /* Opacité initiale */
+    transition: opacity 0.5s ease; /* Transition pour le fondu */
+   
+
+    
+
+}
+
+#gameplay.hidden {
+    opacity: 0; /* L'opacité devient 0 pour le fondu */
 }

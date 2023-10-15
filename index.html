@@ -22,7 +22,7 @@
 
     </div>
     <div id="gameplay">
-        <img src="/assets/img/gameplay.jpg" alt="gameplay" width="750px">
+        <img src="/assets/img/gameplay.jpg" alt="gameplay" width="600px">
     </div>
     <div id="overlay" style="display: none;">
 
@@ -570,7 +570,7 @@
         }
         function endGame() {
             port.destroy();
-           
+
             boat.setTexture('boat4Sinking');
             boat.setScale(0.5);
             // this.tweens.add({
@@ -604,7 +604,12 @@
                 }, 50); // Délai court pour s'assurer que le changement de `display` a eu lieu
             }, 1000);
         }
-     
+        const gameplayDiv = document.getElementById('gameplay');
+
+        setTimeout(() => {
+            gameplayDiv.classList.add('hidden');
+        }, 5000);
+
     </script>
 
 </body>
