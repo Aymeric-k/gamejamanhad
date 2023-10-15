@@ -100,8 +100,8 @@
             this.load.image('mainV', './assets/img/main_vertic.png')
             this.load.image('baril', './assets/img/baril.png');
             this.load.spritesheet('wave', './assets/img/sprite_wave.png', {
-                frameWidth:984,
-                frameHeight:250
+                frameWidth:480,
+                frameHeight:195
             })
 
 
@@ -135,7 +135,7 @@
 
             wave.setCollideWorldBounds(true);
             wave.onWorldBounds = true;
-            wave.body.setSize(80, 80, 10, 10);
+            wave.body.setSize(40, 40, 10, 10);
             sea.setScale(0.8)
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
             this.anims.create({
