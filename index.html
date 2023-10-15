@@ -131,11 +131,11 @@
                 this.load.image(`boat${i}`, `./assets/img/boat${i}.png`);
                 boats.push(`boat${i}`);
             }
-            for (let i = 1; i <= 11; i++) {
+            for (let i = 1; i <= 10; i++) {
                 this.load.image(`boat${i}Sinking`, `./assets/img/boat${i}Sinking.png`);
             }
             for (let i = 1; i <= 17; i++) {
-                this.load.image(`detritut${i}`, `./assets/img/det${i}.png`);
+                this.load.image(`det${i}`, `./assets/img/det${i}.png`);
             }
             this.load.image('sea', './assets/img/sea.jpg');
 
@@ -143,7 +143,6 @@
             this.load.image('portH', './assets/img/ponton_horizont.png');
             this.load.image('mainH', './assets/img/main_horizont.png')
             this.load.image('mainV', './assets/img/main_vertic.png')
-            this.load.image('baril', './assets/img/baril.png');
             this.load.spritesheet('wave', './assets/img/sprite_wave.png', {
                 frameWidth: 480,
                 frameHeight: 195
@@ -160,7 +159,8 @@
             sea = this.add.image(-5, -5, 'sea')
             wave = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'wave').setInteractive();
             wave.setScale(0.4)
-            detritut = this.physics.add(window.innerWidth, window.innerHeight, 'detritut')
+            detritut = this.physics.add.image(window.innerWidth, window.innerHeight, 'det4')
+            detritut.setScale(0.08)
             if (randomSide === 1 || randomSide === 2) {
 
                 port = this.physics.add.image(xx, yy, 'mainV');  // Utilisez le ponton vertical
@@ -270,7 +270,7 @@
 
         function update(delta) {
             detritut.x-=1
-            detr
+            detritut.y-=1
             this.detritutGroup.getChildren().forEach(detritut => {
                 if (detritut.x < 0 || detritut.x > window.innerWidth || detritut.y < 0 || detritut.y > window.innerHeight) {
                     detritut.destroy();
@@ -328,7 +328,7 @@
             if (follow) {
 
                 if ((gaugeValue < boaat.speedThreshold[0])) {
-                    console.log(boaat.speedThreshold[0])
+                 
                     vitesse = 2;
                 } else if (gaugeValue > boaat.speedThreshold[1]) {
                     // Utilisez le sprite du bateau qui coule
@@ -512,7 +512,7 @@
             const minutes = Math.floor(time / 60);
             const seconds = time % 60;
             const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-            console.log(gaugeValue)
+            
             countdownElement.innerText = `TIMER: ${minutes}:${formattedSeconds}`;
 
             if (time > 0) {
@@ -533,7 +533,8 @@
 
                 boat.setTexture('boat' + (currentBoatIndex + 1))
                 boat.setScale(boatsData[currentBoatIndex].scale);
-
+                detritut.setTexture('det'+currentBoatIndex)
+                detritut.setScale(0.1)
                 wave.setScale((boatsData[currentBoatIndex + 1]).waveScale);
 
                 selectedBoatIndex++;
@@ -560,7 +561,7 @@
         function endGame(){
             port.destroy();
             boat.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
-            boat.setTexture('boat11Sinking');
+            boat.setTexture('boat4Sinking');
             boat.setScale(0.5)
         }
 
