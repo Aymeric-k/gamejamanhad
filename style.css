@@ -59,3 +59,9 @@ body{
     transition: opacity 1s; /* animation de fondu pendant 1 seconde */
     z-index: 9999; /* s'assurer qu'il s'affiche au-dessus des autres éléments */
 }
+#gameplay{
+    position: absolute;
+    left: 100%;
+    top: 0%;
+    transform: translate(-50%, -50%);
+}

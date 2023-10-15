@@ -21,6 +21,9 @@
     <div class="image">
 
     </div>
+    <div id="gameplay">
+        <img src="/assets/img/gameplay.jpg" alt="gameplay" width="750px">
+    </div>
     <div id="overlay" style="display: none;">
 
     </div>
@@ -567,15 +570,15 @@
         }
         function endGame() {
             port.destroy();
-            boat.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
+           
             boat.setTexture('boat4Sinking');
             boat.setScale(0.5);
-            this.tweens.add({
-                targets: this.cameras.main,
-                zoom: { from: 1, to: 0.5 }, // Dezoomer de 1x (normal) à 0.5x
-                duration: 10000, // Durée de l'animation en millisecondes
-                ease: 'Linear', // Type d'interpolation
-            });
+            // this.tweens.add({
+            //     targets: this.cameras.main,
+            //     zoom: { from: 1, to: 0.5 }, // Dezoomer de 1x (normal) à 0.5x
+            //     duration: 10000, // Durée de l'animation en millisecondes
+            //     ease: 'Linear', // Type d'interpolation
+            // });
             setTimeout(() => {
                 transitionToOverlay();
             }, 3000);
@@ -601,7 +604,7 @@
                 }, 50); // Délai court pour s'assurer que le changement de `display` a eu lieu
             }, 1000);
         }
-
+     
     </script>
 
 </body>
