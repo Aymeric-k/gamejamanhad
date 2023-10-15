@@ -243,7 +243,7 @@
             calculBoatWave();
             boatsData.forEach((boaat) => {
                     
-                    if (gaugeValue < boaat.speedThreshold[0] && follow==true) {
+                    if (gaugeValue < boaat.speedThreshold[0]) {
                         vitesse = 2;
                     } else if (gaugeValue > boaat.speedThreshold[1]) {
                         // Utilisez le sprite du bateau qui coule
@@ -275,7 +275,10 @@
                 let distance = Math.sqrt(differenceXBoatWave * differenceXBoatWave + differenceYBoatWave * differenceYBoatWave);
 
                 // Si le bateau est très proche de la vague, arrêtez de le déplacer
-                if (distance <= 10) return;
+                if (distance <= 10) {
+                    follow = true 
+                    return;
+                }
                 if (xAxis < 0) {
                     // Si vous allez vers la gauche
                     // retourner le bateau
