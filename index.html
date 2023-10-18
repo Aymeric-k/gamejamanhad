@@ -236,7 +236,7 @@
             wave.onWorldBounds = true;
             wave.body.setSize(40, 40, 10, 10);
             port.body.setSize(port.width, port.height);
-            sea.setScale(1)
+          
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
             this.anims.create({
                 key: 'wavy',
@@ -467,7 +467,7 @@
                 let distance = Math.sqrt(differenceXBoatWave * differenceXBoatWave + differenceYBoatWave * differenceYBoatWave);
 
                 // Si le bateau est très proche de la vague, arrêtez de le déplacer
-                if (distance <= 10) {
+                if (distance <= 20) {
                     follow = true
                     return;
                 }
