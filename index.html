@@ -31,7 +31,7 @@
     </div>
 
     <div id="gameplay" style="display: none;">
-        <img src="./assets/img/gameplay.jpg" alt="gameplay" width="600px">
+        <img src="./assets/img/gameplay.jpg" alt="gameplay">
     </div>
 
     <script>
@@ -101,7 +101,7 @@
 
         ]
         let delta = 0;
-        let isGamePaused =false
+        let isGamePaused = false
         const detScale = [
             0.3,
         ]
@@ -157,10 +157,21 @@
         }
 
         function createBoot() {
-            let mainMenu = this.add.image(0, 0, 'splash').setOrigin(0, 0);
-            hud.style.display = 'none';
-            mainMenu.displayWidth = this.sys.canvas.width;
-            mainMenu.displayHeight = this.sys.canvas.height;
+            let splashTexture = this.textures.get('splash');
+            let splashRatio = splashTexture.getSourceImage().width / splashTexture.getSourceImage().height;
+            let canvasRatio = this.sys.canvas.width / this.sys.canvas.height;
+
+            let mainMenu = this.add.image(this.sys.canvas.width / 2, this.sys.canvas.height / 2, 'splash').setOrigin(0.5, 0.5);
+
+            if (canvasRatio > splashRatio) {
+                // The canvas is wider than the splash image (relative to their heights)
+                mainMenu.displayWidth = this.sys.canvas.width;
+                mainMenu.displayHeight = this.sys.canvas.width / splashRatio;
+            } else {
+                // The canvas is taller (or the same height) as the splash image (relative to their widths)
+                mainMenu.displayHeight = this.sys.canvas.height;
+                mainMenu.displayWidth = this.sys.canvas.height * splashRatio;
+            }
 
             setTimeout(() => {
                 this.scene.start('main');
@@ -334,7 +345,7 @@
         }
 
         function update(time, deltaTime) {
-            
+
             if (!turtle) {
                 generateDetritut(this, 1)
                 generateDetritut(this, 1)
@@ -361,7 +372,7 @@
                 delayTriggered = true;
             }
             if (delayTriggered) {
-                delta+=deltaTime
+                delta += deltaTime
             }
             if (!boatIsSinking) {
                 if (gamepad) {
@@ -606,7 +617,7 @@
                     xx = game.config.width - 50
                     yy = Phaser.Math.Between(upperLimit, lowerLimit);
                     if (currentBoatIndex < 3) {
-                        console.log('test' )
+                        console.log('test')
                         port.setTexture('mainH');
                         port.flipY = true
                     } else {
@@ -616,7 +627,7 @@
                 default:
                     break;
             }
-            
+
             currentSide = randomSide;
             port.x = xx
             port.y = yy

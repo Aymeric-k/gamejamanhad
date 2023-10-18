@@ -63,7 +63,9 @@ body{
 #gameplay{
     position: absolute;
     right: 35%;
-    top: 35%;
+    top: 15%;
+    width: 889.7px;
+    height: 572.6px;
     /* transform: translate(-15%, -25%); */
     opacity: 1; /* Opacité initiale */
     transition: opacity 0.5s ease; /* Transition pour le fondu */
