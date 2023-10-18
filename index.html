@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <div class="hud">
+    <div class="hud" style="display: none;">
         <div class="score">
             <h2 class="scorer">SCORE : 0</h2>
         </div>
@@ -21,14 +21,17 @@
     <div class="image">
 
     </div>
-    <div id="gameplay">
-        <img src="./assets/img/gameplay.jpg" alt="gameplay" width="600px">
-    </div>
+
     <div id="overlay" style="display: none;">
         <img id="creditsImage" src="./assets/img/credits.jpg" alt="Credits"
             style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0;">
         <p id="replayButton"
-            style="display: none; font-size:60px; color: white; position:  absolute; bottom: 10%; right: 5%; opacity: 0; text-shadow: 5px 3px 3px rgba(0,0,0,0.75); cursor: pointer;">Rejouer</p>
+            style="display: none; font-size:60px; color: white; position:  absolute; bottom: 10%; right: 5%; opacity: 0; text-shadow: 5px 3px 3px rgba(0,0,0,0.75); cursor: pointer;">
+            Rejouer</p>
+    </div>
+
+    <div id="gameplay" style="display: none;">
+        <img src="./assets/img/gameplay.jpg" alt="gameplay" width="600px">
     </div>
 
     <script>
@@ -67,12 +70,15 @@
         let detrituts = []
         let isPaused = false;
         let thisscene = this
-
+        const hud = document.querySelector('.hud')
+        const startButton = document.querySelector('.startButton')
+        const gameplay = document.querySelector('#gameplay');
         let gamepads = navigator.getGamepads();
         let boatIsSinking = false;
         let boatHasSunk = false;
         let randomDet = Math.floor(Math.random() * 4) + 1;
         let targetX, targetY;
+        let delayTriggered = false;
         const GAUGE_DECREASE = 4;
         let GAUGE_INCREASE = 2.5;
         const SPEED_REDUCTION = 3;
@@ -94,6 +100,8 @@
 
 
         ]
+        let delta = 0;
+        let isGamePaused =false
         const detScale = [
             0.3,
         ]
@@ -143,6 +151,21 @@
         }
 
         let currentSide = randomSide;
+
+        function preloadBoot() {
+            this.load.image('splash', './assets/img/intro.jpg');
+        }
+
+        function createBoot() {
+            let mainMenu = this.add.image(0, 0, 'splash').setOrigin(0, 0);
+            hud.style.display = 'none';
+            mainMenu.displayWidth = this.sys.canvas.width;
+            mainMenu.displayHeight = this.sys.canvas.height;
+
+            setTimeout(() => {
+                this.scene.start('main');
+            }, 5000);
+        }
 
         function preload() {
 
@@ -220,9 +243,22 @@
             boat.body.setSize(boat.width + 30, boat.height + 30);
             port.depth = 2;
             boat.depth = 3;
+            hud.style.display = "flex";
+
+            gameplay.style.display = "block"
         }
+        let bootScene = {
+            key: 'boot',
+            preload: preloadBoot,
+            create: createBoot
+        };
 
-
+        let mainScene = {
+            key: 'main',
+            preload: preload,
+            create: create,
+            update: update
+        };
         let config = {
             type: Phaser.WEBGL, // Définit le moteur graphique à utilisé CANVAS, WEBGL ou AUTO.
             width: window.innerWidth,
@@ -231,11 +267,9 @@
                 default: 'arcade',
                 arcade: { debug: false }
             }, // définit la physique utiliser par phaser
-            scene: {
-                preload: preload,
-                create: create,
-                update: update
-            },
+            scene: [
+                bootScene, mainScene
+            ],
             input: {
                 gamepad: true  // Activez ici le gamepad
             }// configure la scene utiliser pour phaser.
@@ -299,7 +333,8 @@
 
         }
 
-        function update(delta) {
+        function update(time, deltaTime) {
+            
             if (!turtle) {
                 generateDetritut(this, 1)
                 generateDetritut(this, 1)
@@ -309,8 +344,25 @@
                 turtle = true
 
             }
+            if (gameplay.style.display === "block" && !delayTriggered) {
+                // Pause the current scene
+                this.scene.pause();
 
-            console.log(currentBoatIndex + ' currentPhase = ' + currentPhase)
+                // Set the delay
+                setTimeout(() => {
+                    // Change display to none
+                    gameplay.style.display = "none";
+
+                    // Resume the scene
+                    this.scene.resume();
+                }, 7000);  // 5 seconds delay
+
+                // Mark that the delay has been triggered to avoid multiple triggers
+                delayTriggered = true;
+            }
+            if (delayTriggered) {
+                delta+=deltaTime
+            }
             if (!boatIsSinking) {
                 if (gamepad) {
                     if (gamepad.axes.length >= 2) {
@@ -532,6 +584,7 @@
                     yy = game.config.height - 40
                     xx = Phaser.Math.Between(leftLimit, rightLimit);
                     if (currentBoatIndex < 3) {
+                        console.log('je suis rentré dans 2 et je suis a lenvers')
                         port.setTexture('mainV');
                         port.flipX = true
                     } else {
@@ -543,7 +596,7 @@
                     yy = Phaser.Math.Between(upperLimit, lowerLimit);
                     if (currentBoatIndex < 3) {
                         port.setTexture('mainH');
-                       
+
 
                     } else {
                         port.setTexture('portH')
@@ -553,6 +606,7 @@
                     xx = game.config.width - 50
                     yy = Phaser.Math.Between(upperLimit, lowerLimit);
                     if (currentBoatIndex < 3) {
+                        console.log('test' )
                         port.setTexture('mainH');
                         port.flipY = true
                     } else {
@@ -562,6 +616,7 @@
                 default:
                     break;
             }
+            
             currentSide = randomSide;
             port.x = xx
             port.y = yy
@@ -630,8 +685,8 @@
 
                 // Après l'effet de grandissement, lancez le flash
                 let flash = scene.add.rectangle(0, 0, game.config.width, game.config.height, 0xFFFFFF);
-                const hud = document.querySelector('.hud')
-                hud.style.display ="none"
+
+                hud.style.display = "none"
                 flash.setOrigin(0, 0);
                 flash.alpha = 0;
                 flash.depth = 10
@@ -736,7 +791,7 @@
 
 
 
-        } 7
+        }
         function transitionToOverlay(scene) {
             const canvas = document.querySelector('canvas');
             const overlay = document.getElementById('overlay');
@@ -776,17 +831,13 @@
                     }, 3000);
                     document.getElementById('replayButton').addEventListener('click', () => {
                         // Code pour réinitialiser votre jeu ou scène ici
-                       location.reload();
+                        location.reload();
                     });
 
                 }, 50); // Délai court pour s'assurer que le changement de `display` a eu lieu
             }, 1000);
         }
-        const gameplayDiv = document.getElementById('gameplay');
 
-        setTimeout(() => {
-            gameplayDiv.classList.add('hidden');
-        }, 5000);
 
     </script>
 

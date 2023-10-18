@@ -57,14 +57,14 @@ body{
     background: url('./assets/img/fond-terre.png') no-repeat center center fixed;
     background-size: cover;
     opacity: 0;
-    transition: opacity 1s; /* animation de fondu pendant 1 seconde */
-    z-index: 9999; /* s'assurer qu'il s'affiche au-dessus des autres éléments */
+    transition: opacity 1s; 
+    z-index: 9999; 
 }
 #gameplay{
     position: absolute;
-    left: 15%;
-    top: 25%;
-    transform: translate(-15%, -25%);
+    right: 35%;
+    top: 35%;
+    /* transform: translate(-15%, -25%); */
     opacity: 1; /* Opacité initiale */
     transition: opacity 0.5s ease; /* Transition pour le fondu */
    

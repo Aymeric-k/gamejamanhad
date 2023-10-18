@@ -1,0 +1,22 @@
+"Unwavering" est un jeu jouable uniquement avec une manette, plaçant le joueur dans la peau d'une vague raccompagnant des bateaux à bon port dans un laps de temps imparti.
+
+Afin de lancer le jeu, vous devez l'héberger sur un serveur. Voici plusieurs méthodes possibles :
+
+Hébergement Web classique : Une méthode simple consiste à utiliser un service d'hébergement web traditionnel tel que GitHub Pages, Netlify, Firebase Hosting ou AWS S3. Vous devrez uploader les fichiers du jeu sur le serveur en utilisant un client FTP ou un outil d'upload fourni par la plateforme, puis partager le lien vers votre jeu.
+
+Serveur personnel : Si vous avez accès à un serveur, vous pouvez héberger le jeu en plaçant les fichiers dans un répertoire dédié. Vous pouvez utiliser un serveur web comme Apache, Nginx ou Microsoft IIS pour servir les fichiers du jeu. Il faudra configurer le serveur pour bien présenter les fichiers du jeu Phaser, puis partager l'URL du jeu.
+
+Plateforme de déploiement de jeux : Il existe des plateformes dédiées à l'hébergement de jeux, telles que itch.io ou Game Jolt. En créant un compte sur l'une de ces plateformes, vous pourrez suivre les instructions pour téléverser et héberger le jeu. Ces plateformes offrent souvent des outils pour organiser et présenter le jeu de manière attrayante.
+
+Cloud Computing : Si vous possédez des compétences en cloud computing, vous pouvez utiliser des services cloud tels qu'Amazon EC2, Microsoft Azure, Google Cloud Platform ou DigitalOcean. Vous pourrez créer une instance virtuelle et y déployer le jeu en configurant le serveur web et en téléchargeant les fichiers nécessaires. Ensuite, partagez l'adresse IP ou le nom de domaine associé à cette instance.
+
+Auto-hébergement : Si vous avez une connexion Internet stable, vous pouvez envisager l'auto-hébergement en utilisant des logiciels tels que XAMPP (pour un serveur local) ou en configurant votre routeur pour rediriger les requêtes vers votre ordinateur. Cependant, cette méthode nécessite des compétences techniques avancées et peut être moins fiable que les autres options.
+
+Cordialement,
+
+L'équipe de "Unwavering"
+
+En cas de problème, veuillez nous contacter via les informations suivantes :
+
+Aymeric Kreicher : aymeric.kreicher@gmail.com, 0610103831
+Fouad Maaroufi : Maaroufi.fouad.pro@gmail.com, 0613353161
