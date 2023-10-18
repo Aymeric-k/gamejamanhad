@@ -210,7 +210,12 @@
             this.input.gamepad.on('connected', function (pad) {
                 gamepad = pad;
             });
-            sea = this.add.image(-5, -5, 'sea')
+            sea = this.add.image(0, 0, 'sea')
+            let seaRatioWidth = config.width / seaImage.width;
+            let seaRatioHeight = config.height / seaImage.height;
+            let maxRatio = Math.max(seaRatioWidth, seaRatioHeight);
+            seaImage.setScale(maxRatio);
+            seaImage.setOrigin(0, 0);
             wave = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'wave').setInteractive();
             wave.setScale(0.4)
 
@@ -236,7 +241,7 @@
             wave.onWorldBounds = true;
             wave.body.setSize(40, 40, 10, 10);
             port.body.setSize(port.width, port.height);
-          
+
             timerEvent = this.time.addEvent({ delay: 1000, callback: updateCountdown, callbackScope: this, loop: true });
             this.anims.create({
                 key: 'wavy',
